@@ -231,7 +231,7 @@ main(int argc, char **argv)
   static struct sockaddr_in client_addr; /* static = initialized to zeros */
   static struct sockaddr_in server_addr; /* static = initialized to zeros */
 
-  if (argc < 3  || argc > 3 || !strcmp(argv[1], "-h") ) {
+  if (argc < 3  || argc > 3 || !strcmp(argv[1], "-h") || !strcmp(argv[1], "--help")) {
     (void)printf(" ____                 _\n"
                  "|  _ \\               | |\n"
                  "| |_) |_ __ ___ _ __ | |_\n"
