@@ -155,8 +155,8 @@ handle_request(int fd, int req)
     }
 
     /* strip everything after the uri */
-    for (i = 4; i < BUFSIZE; i++) { /* null terminate after the second space to ignore extra stuff */
-        if (buffer[i] == ' ') { /* string is "GET URL " + lots of other stuff */
+    for (i = 4; i < BUFSIZE; i++) {  /* null terminate after the second space to ignore extra stuff */
+        if (buffer[i] == ' ' || buffer[i] == '?') { /* string is "GET URL " + lots of other stuff */
             buffer[i] = 0;
             break;
         }
