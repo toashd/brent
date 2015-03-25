@@ -138,15 +138,15 @@ handle_request(int fd, int req)
     int j, file_fd, buflen;
     long i, ret, len;
     char *fstr;
-    static char buffer[BUFSIZE+1]; /* static so zero filled */
+    static char buffer[BUFSIZE+1];  /* static so zero filled */
 
-    ret = read(fd, buffer, BUFSIZE); /* read request in one go */
-    if (ret == 0 || ret == -1) { /* read failure stop now */
+    ret = read(fd, buffer, BUFSIZE);  /* read request in one go */
+    if (ret == 0 || ret == -1) {  /* read failure stop now */
         logger(FORBIDDEN, "failed to read request", "", fd);
     }
 
-    if (ret > 0 && ret < BUFSIZE) /* return code is valid chars */
-        buffer[ret] = 0; /* terminate the buffer */
+    if (ret > 0 && ret < BUFSIZE)  /* return code is valid chars */
+        buffer[ret] = 0;  /* terminate the buffer */
     else
         buffer[0] = 0;
 
@@ -164,12 +164,12 @@ handle_request(int fd, int req)
 
     logger(LOG, "Request", buffer, req);
 
-    for (j = 0; j < i-1; j++) /* check for illegal parent directory use .. */
+    for (j = 0; j < i-1; j++)  /* check for illegal parent directory use .. */
         if (buffer[j] == '.' && buffer[j+1] == '.') {
             logger(FORBIDDEN, "Parent directory (..) path not supported", buffer, fd);
         }
 
-    if (!strncmp(&buffer[0], "GET /\0", 6) || !strncmp(&buffer[0], "get /\0", 6)) /* convert no filename to index file */
+    if (!strncmp(&buffer[0], "GET /\0", 6) || !strncmp(&buffer[0], "get /\0", 6))  /* convert no filename to index file */
         (void)strcpy(buffer, "GET /index.html");
 
     /* check if file type is supported */
@@ -191,15 +191,15 @@ handle_request(int fd, int req)
 
     logger(LOG, "Response (200 OK)", &buffer[5], req);
 
-    len = (long)lseek(file_fd, (off_t)0, SEEK_END); /* lseek to the file end to find the length */
-    (void)lseek(file_fd, (off_t)0, SEEK_SET); /* lseek back to the file start ready for reading */
+    len = (long)lseek(file_fd, (off_t)0, SEEK_END);  /* lseek to the file end to find the length */
+          (void)lseek(file_fd, (off_t)0, SEEK_SET);  /* lseek back to the file start ready for reading */
 
     (void)sprintf(buffer,
                   "HTTP/1.1 200 OK\n"
                   "Server: brent/%s\n"
                   "Content-Length: %ld\n"
                   "Connection: close\n"
-                  "Content-Type: %s\n\n", VERSION, len, fstr); /* Header + a blank line */
+                  "Content-Type: %s\n\n", VERSION, len, fstr);  /* Header + a blank line */
 
     (void)write(fd, buffer, strlen(buffer));
 
@@ -228,8 +228,8 @@ main(int argc, char **argv)
     int i, port, pid, listen_fd, socket_fd, req;
     socklen_t length;
 
-    static struct sockaddr_in client_addr; /* static = initialized to zeros */
-    static struct sockaddr_in server_addr; /* static = initialized to zeros */
+    static struct sockaddr_in client_addr;  /* static = initialized to zeros */
+    static struct sockaddr_in server_addr;  /* static = initialized to zeros */
 
     if (argc < 3  || argc > 3 || !strcmp(argv[1], "-h") || !strcmp(argv[1], "--help")) {
         (void)printf(" ____                 _\n"
@@ -274,15 +274,15 @@ main(int argc, char **argv)
 
     /* become deamon and unstopable and no zombies children (= no wait()) */
     if (fork() != 0)
-        return 0; /* parent returns OK to shell */
+        return 0;  /* parent returns OK to shell */
 
-    (void)signal(SIGCLD, SIG_IGN); /* ignore child death */
-    (void)signal(SIGHUP, SIG_IGN); /* ignore terminal hangups */
+    (void)signal(SIGCLD, SIG_IGN);  /* ignore child death */
+    (void)signal(SIGHUP, SIG_IGN);  /* ignore terminal hangups */
 
     for (i = 0; i < 32; i++)
-        (void)close(i); /* close open files */
+        (void)close(i);  /* close open files */
 
-    (void)setpgrp(); /* break away from process group */
+    (void)setpgrp();  /* break away from process group */
 
     logger(LOG, "brent starting on port", argv[1], getpid());
 
@@ -315,10 +315,10 @@ main(int argc, char **argv)
         if ((pid = fork()) < 0) {
             logger(ERROR, "system call", "fork", 0);
         } else {
-            if (pid == 0) { /* child */
+            if (pid == 0) {  /* child */
                 (void)close(listen_fd);
-                handle_request(socket_fd, req); /* never returns */
-            } else { /* parent */
+                handle_request(socket_fd, req);  /* never returns */
+            } else {  /* parent */
                 (void)close(socket_fd);
             }
         }
