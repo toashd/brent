@@ -31,7 +31,8 @@
 # Debug files
 *.dSYM/
 
-# Logfiles
+# Log & original files
 *.log
+*.orig
 
 brent
