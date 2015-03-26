@@ -7,8 +7,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#define PORT       8888		        /* Port number as an integer */
-#define IP_ADDRESS "192.168.0.8"	/* IP Address as a string */
+#define PORT       8888           /* Port number as an integer */
+#define IP_ADDRESS "192.168.0.8"  /* IP Address as a string */
 
 #define BUFSIZE 8196
 
