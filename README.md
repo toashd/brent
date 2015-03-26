@@ -24,9 +24,9 @@ If you want it to run faster you could include optimization:
 
     $ gcc -O2 brent.c -o brent
 
-Run brent on port 8383 serving files from within the examples directory:
+Run brent, e.g. on port 8888 serving files from within the examples directory:
 
-	  $ ./brent 8383 examples/
+	  $ ./brent 8888 examples/web
 
 
 Brent will behave like a daemon process, thus disconnects from the user or terminal session, goes into the background, closes input and output I/O & protects itself from you logging off. All errors or warnings go in the log file - see the logs with:
