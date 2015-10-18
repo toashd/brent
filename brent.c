@@ -11,11 +11,11 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+#include "version.h"
+
 #ifndef SIGCLD
 #   define SIGCLD SIGCHLD
 #endif
-
-#define VERSION "0.1.0"
 
 #define LOGFILE "brent.log"
 
@@ -26,7 +26,7 @@
 #define FORBIDDEN 403
 #define NOTFOUND  404
 
-/* allowed file extensions */
+/* allowed mime types */
 struct {
     char *ext;
     char *filetype;
@@ -225,50 +225,48 @@ handle_request(int fd, int req)
 int
 main(int argc, char **argv)
 {
+    char* ipaddr = "0.0.0.0";
+    char* dir = "public";
+    char* cPort = "8000";
     int i, port, pid, listen_fd, socket_fd, req;
     socklen_t length;
 
     static struct sockaddr_in client_addr;  /* static = initialized to zeros */
     static struct sockaddr_in server_addr;  /* static = initialized to zeros */
 
-    if (argc < 3  || argc > 3 || !strcmp(argv[1], "-h") || !strcmp(argv[1], "--help")) {
-        (void)printf(" ____                 _\n"
-                     "|  _ \\               | |\n"
-                     "| |_) |_ __ ___ _ __ | |_\n"
-                     "|  _ <| '__/ _ \\ '_ \\| __|\n"
-                     "| |_) | | |  __/ | | | |_\n"
-                     "|____/|_|  \\___|_| |_|\\__| NANO WEB SERVER - v %s\n\n"
-                     "usage:  brent <port> <appdir>\n"
-                     "\tbrent is a small and safe nano web server\n"
-                     "\tbrent only serves files/web pages with extensions named below\n"
-                     "\t and only from the specified application and its sub-directories.\n"
-                     "\tThere are no fancy features = safe and secure.\n\n"
-                     "\tExample: brent 8383 /var/www/app\n\n"
-                     "\tOnly supports:", VERSION);
+    if (argc > 1 && (!strcmp(argv[1], "-v") || !strcmp(argv[1], "--version") || !strcmp(argv[1], "version")))
+        return printf(VERSION_STRING, VERSION);
 
-        for (i = 0; extensions[i].ext != 0; i++)
-            (void)printf(" %s", extensions[i].ext);
+    if (argc > 1 && (argc > 7 || !strcmp(argv[1], "-h") || !strcmp(argv[1], "--help") || !strcmp(argv[1], "help")))
+        return printf(HELP_STRING, VERSION);
 
-        (void)printf("\n\tNot supported: URLs including \"..\", java, php, cgi, etc.\n"
-                     "\tNot supported: directories / /etc /bin /lib /tmp /usr /dev /sbin \n"
-                     "\tNo warranty given or implied\n\tTobias Schmid <toashd@gmail.com>\n");
-
-        exit(0);
+    for (i = 1; i < argc; i++) {
+        if (!strcmp(argv[i], "-b") || !strcmp(argv[i], "--bind")) {
+            if (i == argc-1) return printf(USAGE_STRING);
+            ipaddr = argv[++i];
+        } else if (!strcmp(argv[i], "-p") || !strcmp(argv[i], "--port")) {
+            if (i == argc-1) return printf(USAGE_STRING);
+            cPort = NULL;
+            port = strtol(argv[++i], &cPort, 10);
+        } else if (!strcmp(argv[i], "-d") || !strcmp(argv[i], "--dir")) {
+                if (i == argc-1) return printf(USAGE_STRING);
+                dir = argv[++i];
+        } else
+            return printf(USAGE_STRING);
     }
 
-    if (!strncmp(argv[2], "/"   , 2) || !strncmp(argv[2], "/etc", 5) ||
-        !strncmp(argv[2], "/bin", 5) || !strncmp(argv[2], "/lib", 5) ||
-        !strncmp(argv[2], "/tmp", 5) || !strncmp(argv[2], "/usr", 5) ||
-        !strncmp(argv[2], "/dev", 5) || !strncmp(argv[2], "/sbin",6)) {
+    if (!strncmp(dir, "/"   , 2) || !strncmp(dir, "/etc", 5) ||
+        !strncmp(dir, "/bin", 5) || !strncmp(dir, "/lib", 5) ||
+        !strncmp(dir, "/tmp", 5) || !strncmp(dir, "/usr", 5) ||
+        !strncmp(dir, "/dev", 5) || !strncmp(dir, "/sbin",6)) {
 
-        (void)printf("ERROR: Bad top directory %s, see brent -h\n", argv[2]);
+        (void)printf("ERROR: Bad top directory %s, see brent -h\n", dir);
 
         exit(3);
     }
 
-    if (chdir(argv[2]) == -1) {
-        (void)printf("ERROR: Can't change to directory %s\n", argv[2]);
-
+    if (chdir(dir) == -1) {
+        (void)printf("ERROR: Can't change to directory %s. Does not exist.\n", dir);
         exit(4);
     }
 
@@ -284,20 +282,20 @@ main(int argc, char **argv)
 
     (void)setpgrp();  /* break away from process group */
 
-    logger(LOG, "brent starting on port", argv[1], getpid());
+    logger(LOG, "brent starting on port", cPort, getpid());
 
     /* setup the network socket */
 
     if ((listen_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
         logger(ERROR, "system call", "socket", 0);
 
-    port = atoi(argv[1]);
+    port = atoi(cPort);
 
-    if (port < 0 || port > 60000)
-        logger(ERROR, "Invalid port number (use 1 up to 60000)", argv[1], 0);
+    if (port < 0 || port > 65535)
+        logger(ERROR, "Invalid port number (use 1 up to 65535)", cPort, 0);
 
     server_addr.sin_family = AF_INET;
-    server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    server_addr.sin_addr.s_addr = inet_addr(ipaddr);
     server_addr.sin_port = htons(port);
 
     if (bind(listen_fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0)
