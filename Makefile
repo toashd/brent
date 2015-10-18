@@ -17,6 +17,6 @@ stop:
 
 serve: build
 	@echo "Serving example on localhost:8000"
-	@./brent -d $(EXAMPLE)
+	@./build/brent -d $(EXAMPLE)
 
 .PHONY: build clean serve stop
