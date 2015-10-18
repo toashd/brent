@@ -44,7 +44,7 @@ Stop brent with
 
 ## Contribute
 
-Brent's main intention was to provide a small and secure web server for static sites written in C without libraries and with a code base being as small as possible with just a few trade-offs for readability.
+Brent's main intention is to provide a small and secure web server for static sites written in C without libraries and with a code base being as small as possible with just a few trade-offs for readability.
 
 Please feel free to suggest any kind of improvements, refactorings, bug reports - just [file an issue](https://github.com/toashd/brent/issues) and I'll do my best to accommodate you. If you like the project giving it a star would show your support and would be very much appreciated!
 
@@ -53,4 +53,4 @@ Pull request are always welcome no matter how big or small.
 ### License
 brent is available under the MIT license. See the [LICENSE](LICENSE) for more info.
 
-Copyright (c) 2015 | Tobias Schmid | [toashd.com](http://toashd.com)
+Copyright (c) 2015 - Tobias Schmid [toashd.com](http://toashd.com)
