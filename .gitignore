@@ -35,4 +35,8 @@
 *.log
 *.orig
 
+# build dirs
+/build
+
+.DS_Store
 brent
